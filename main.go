@@ -29,7 +29,14 @@ func (ablum *Ablum)FillAndDownloadImages(group *sync.WaitGroup) []string {
 
 	var url string = ablum.Href
 	fmt.Println("download cover image:", ablum.Cover)
-	DownloadFile(fmt.Sprintf("imgs/%d_%d_cover.jpg", ablum.Id, time.Now().UnixMilli()), ablum.Cover)
+	coverLocalFile := fmt.Sprintf("imgs/%d_%d_cover.jpg",ablum.Id, time.Now().UnixMilli())
+	err := DownloadFile(coverLocalFile, ablum.Cover)
+	var noCover bool = false
+	if(err != nil){
+		fmt.Println("download cover image error")
+		os.Remove(coverLocalFile)
+		noCover = true
+	}
 
 	imageList := []string{}
 	visitedUrl := make(map[string] bool)
@@ -75,6 +82,9 @@ func (ablum *Ablum)FillAndDownloadImages(group *sync.WaitGroup) []string {
 	}//end for each
 	
 	ablum.Images = imageList
+	if(noCover && len(ablum.Images) > 0){
+		ablum.Cover = ablum.Images[0]
+	}
 	return imageList
 }
 
@@ -172,7 +182,7 @@ func main() {
 
 	ablums := fetchAblums("http://www.mzitu.cc/page/index_10.html")
 	var wg sync.WaitGroup
-
+	
 	for i := range ablums {
 		wg.Add(1)
 		go ablums[i].FillAndDownloadImages(&wg)
