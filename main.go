@@ -205,7 +205,7 @@ func main() {
 			url = fmt.Sprintf("http://www.mzitu.cc/xinggan/index_%d.html", i)
 		}
 
-		fmt.Println("Progress : ", i-TotalSize, "/", TotalSize)
+		fmt.Println("Progress : ", TotalSize - i, "/", TotalSize)
 		fmt.Println("Catch page : ", url)
 		sublist := FetchPage(url)
 		ablumsList = append(ablumsList, sublist...)
@@ -213,4 +213,5 @@ func main() {
 
 	jsonData, _ := json.Marshal(ablumsList)
 	os.WriteFile("data/all.json", jsonData, 0777)
+	fmt.Println("Success Enjoy !!!")
 }
